@@ -2994,7 +2994,7 @@
 			};
 			name = Release;
 		};
-		3C7A118F0D0B2EB800B5701F /* Release - Debug */ = {
+		3C7A118F0D0B2EB800B5701F /* Release+Asserts */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				GCC_WARN_64_TO_32_BIT_CONVERSION = NO;
@@ -3002,7 +3002,7 @@
 				OTHER_CFLAGS = "-DENABLE_STRNATPMPERR";
 				PRODUCT_NAME = natpmp;
 			};
-			name = "Release - Debug";
+			name = "Release+Asserts";
 		};
 		3C7A11900D0B2EB800B5701F /* Debug */ = {
 			isa = XCBuildConfiguration;
@@ -3195,7 +3195,7 @@
 			};
 			name = Debug;
 		};
-		51D0F701000000000000000D /* Release - Debug */ = {
+		51D0F701000000000000000D /* Release+Asserts */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				CLANG_CXX_LANGUAGE_STANDARD = "c++20";
@@ -3211,7 +3211,7 @@
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				WARNING_CFLAGS = "-w";
 			};
-			name = "Release - Debug";
+			name = "Release+Asserts";
 		};
 		51D0F701000000000000000E /* Release */ = {
 			isa = XCBuildConfiguration;
@@ -3241,7 +3241,7 @@
 			};
 			name = Debug;
 		};
-		A22CFCBC0FC24F720009BD3E /* Release - Debug */ = {
+		A22CFCBC0FC24F720009BD3E /* Release+Asserts */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				CLANG_WARN_STRICT_PROTOTYPES = NO;
@@ -3249,7 +3249,7 @@
 				GENERATE_MASTER_OBJECT_FILE = YES;
 				PRODUCT_NAME = dht;
 			};
-			name = "Release - Debug";
+			name = "Release+Asserts";
 		};
 		A22CFCBD0FC24F720009BD3E /* Release */ = {
 			isa = XCBuildConfiguration;
@@ -3261,7 +3261,7 @@
 			};
 			name = Release;
 		};
-		A250CFEB0CDA19680068B4B6 /* Release - Debug */ = {
+		A250CFEB0CDA19680068B4B6 /* Release+Asserts */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
@@ -3333,9 +3333,9 @@
 				PRODUCT_BUNDLE_IDENTIFIER = org.retransmission.retransmission;
 				SDKROOT = macosx;
 			};
-			name = "Release - Debug";
+			name = "Release+Asserts";
 		};
-		A250CFEC0CDA19680068B4B6 /* Release - Debug */ = {
+		A250CFEC0CDA19680068B4B6 /* Release+Asserts */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = Transmission_Tahoe;
@@ -3367,9 +3367,9 @@
 				);
 				WRAPPER_EXTENSION = app;
 			};
-			name = "Release - Debug";
+			name = "Release+Asserts";
 		};
-		A250CFEE0CDA19680068B4B6 /* Release - Debug */ = {
+		A250CFEE0CDA19680068B4B6 /* Release+Asserts */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				CLANG_CXX_LIBRARY = "libc++";
@@ -3423,9 +3423,9 @@
 					.,
 				);
 			};
-			name = "Release - Debug";
+			name = "Release+Asserts";
 		};
-		A250CFF20CDA19680068B4B6 /* Release - Debug */ = {
+		A250CFF20CDA19680068B4B6 /* Release+Asserts */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				CLANG_WARN_UNREACHABLE_CODE = NO;
@@ -3436,7 +3436,7 @@
 				OTHER_CFLAGS = "-DHAVE_CONFIG_H";
 				PRODUCT_NAME = event;
 			};
-			name = "Release - Debug";
+			name = "Release+Asserts";
 		};
 		A2E384CF130DFB1D001F501B /* Debug */ = {
 			isa = XCBuildConfiguration;
@@ -3448,7 +3448,7 @@
 			};
 			name = Debug;
 		};
-		A2E384D0130DFB1D001F501B /* Release - Debug */ = {
+		A2E384D0130DFB1D001F501B /* Release+Asserts */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				GCC_PREPROCESSOR_DEFINITIONS = POSIX;
@@ -3456,7 +3456,7 @@
 				GENERATE_MASTER_OBJECT_FILE = YES;
 				PRODUCT_NAME = utp;
 			};
-			name = "Release - Debug";
+			name = "Release+Asserts";
 		};
 		A2E384D1130DFB1D001F501B /* Release */ = {
 			isa = XCBuildConfiguration;
@@ -3486,7 +3486,7 @@
 			};
 			name = Debug;
 		};
-		ADD1A00000000000000000FF /* Release - Debug */ = {
+		ADD1A00000000000000000FF /* Release+Asserts */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				CLANG_WARN_UNREACHABLE_CODE = NO;
@@ -3499,7 +3499,7 @@
 				OTHER_CFLAGS = "-DHAVE_CONFIG_H";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 			};
-			name = "Release - Debug";
+			name = "Release+Asserts";
 		};
 		ADD1A0000000000000000100 /* Release */ = {
 			isa = XCBuildConfiguration;
@@ -3525,14 +3525,14 @@
 			};
 			name = Release;
 		};
-		BE11834A0CE160960002D0F3 /* Release - Debug */ = {
+		BE11834A0CE160960002D0F3 /* Release+Asserts */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				GCC_WARN_64_TO_32_BIT_CONVERSION = NO;
 				GENERATE_MASTER_OBJECT_FILE = YES;
 				PRODUCT_NAME = miniupnp;
 			};
-			name = "Release - Debug";
+			name = "Release+Asserts";
 		};
 		BE11834B0CE160960002D0F3 /* Debug */ = {
 			isa = XCBuildConfiguration;
@@ -3575,7 +3575,7 @@
 			};
 			name = Debug;
 		};
-		C0FFEE00000000000000000D /* Release - Debug */ = {
+		C0FFEE00000000000000000D /* Release+Asserts */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				CLANG_CXX_LANGUAGE_STANDARD = "c++20";
@@ -3592,7 +3592,7 @@
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				WARNING_CFLAGS = "-w";
 			};
-			name = "Release - Debug";
+			name = "Release+Asserts";
 		};
 		C0FFEE00000000000000000E /* Release */ = {
 			isa = XCBuildConfiguration;
@@ -3628,7 +3628,7 @@
 			};
 			name = Debug;
 		};
-		C3D9062427B7E3C900EF2386 /* Release - Debug */ = {
+		C3D9062427B7E3C900EF2386 /* Release+Asserts */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				CLANG_WARN_COMMA = NO;
@@ -3641,7 +3641,7 @@
 				);
 				PRODUCT_NAME = "$(TARGET_NAME)";
 			};
-			name = "Release - Debug";
+			name = "Release+Asserts";
 		};
 		C3D9062527B7E3C900EF2386 /* Release */ = {
 			isa = XCBuildConfiguration;
@@ -3691,7 +3691,7 @@
 			};
 			name = Debug;
 		};
-		ED5E0E902CD30B180071433B /* Release - Debug */ = {
+		ED5E0E902CD30B180071433B /* Release+Asserts */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				CODE_SIGN_ENTITLEMENTS = macosx/QuickLookExtension/QuickLookExtension.entitlements;
@@ -3722,7 +3722,7 @@
 					"third-party/small/include",
 				);
 			};
-			name = "Release - Debug";
+			name = "Release+Asserts";
 		};
 		ED5E0E912CD30B180071433B /* Release */ = {
 			isa = XCBuildConfiguration;
@@ -3765,13 +3765,13 @@
 			};
 			name = Debug;
 		};
-		ED91F0152CBDA5D3008388AA /* Release - Debug */ = {
+		ED91F0152CBDA5D3008388AA /* Release+Asserts */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				GENERATE_MASTER_OBJECT_FILE = YES;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 			};
-			name = "Release - Debug";
+			name = "Release+Asserts";
 		};
 		ED91F0162CBDA5D3008388AA /* Release */ = {
 			isa = XCBuildConfiguration;
@@ -3788,7 +3788,7 @@
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				3C7A11900D0B2EB800B5701F /* Debug */,
-				3C7A118F0D0B2EB800B5701F /* Release - Debug */,
+				3C7A118F0D0B2EB800B5701F /* Release+Asserts */,
 				3C7A118E0D0B2EB800B5701F /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
@@ -3798,7 +3798,7 @@
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				0053D3D40C86774200545606 /* Debug */,
-				A250CFEE0CDA19680068B4B6 /* Release - Debug */,
+				A250CFEE0CDA19680068B4B6 /* Release+Asserts */,
 				4D18389C09DEC01E0047D688 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
@@ -3808,7 +3808,7 @@
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				0053D3D50C86774200545606 /* Debug */,
-				A250CFEC0CDA19680068B4B6 /* Release - Debug */,
+				A250CFEC0CDA19680068B4B6 /* Release+Asserts */,
 				4DF0C599089918A300DD8943 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
@@ -3818,7 +3818,7 @@
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				0053D3DA0C86774200545606 /* Debug */,
-				A250CFEB0CDA19680068B4B6 /* Release - Debug */,
+				A250CFEB0CDA19680068B4B6 /* Release+Asserts */,
 				4DF0C59D089918A300DD8943 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
@@ -3828,7 +3828,7 @@
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				51D0F701000000000000000C /* Debug */,
-				51D0F701000000000000000D /* Release - Debug */,
+				51D0F701000000000000000D /* Release+Asserts */,
 				51D0F701000000000000000E /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
@@ -3838,7 +3838,7 @@
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				A22CFCBB0FC24F720009BD3E /* Debug */,
-				A22CFCBC0FC24F720009BD3E /* Release - Debug */,
+				A22CFCBC0FC24F720009BD3E /* Release+Asserts */,
 				A22CFCBD0FC24F720009BD3E /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
@@ -3848,7 +3848,7 @@
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				A2E384CF130DFB1D001F501B /* Debug */,
-				A2E384D0130DFB1D001F501B /* Release - Debug */,
+				A2E384D0130DFB1D001F501B /* Release+Asserts */,
 				A2E384D1130DFB1D001F501B /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
@@ -3858,7 +3858,7 @@
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				ADD1A00000000000000000FE /* Debug */,
-				ADD1A00000000000000000FF /* Release - Debug */,
+				ADD1A00000000000000000FF /* Release+Asserts */,
 				ADD1A0000000000000000100 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
@@ -3868,7 +3868,7 @@
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				BE11834B0CE160960002D0F3 /* Debug */,
-				BE11834A0CE160960002D0F3 /* Release - Debug */,
+				BE11834A0CE160960002D0F3 /* Release+Asserts */,
 				BE1183490CE160960002D0F3 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
@@ -3878,7 +3878,7 @@
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				0053D3D30C86774200545606 /* Debug */,
-				A250CFF20CDA19680068B4B6 /* Release - Debug */,
+				A250CFF20CDA19680068B4B6 /* Release+Asserts */,
 				BE75C34B0C729EB600DBEFE0 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
@@ -3888,7 +3888,7 @@
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				C0FFEE00000000000000000C /* Debug */,
-				C0FFEE00000000000000000D /* Release - Debug */,
+				C0FFEE00000000000000000D /* Release+Asserts */,
 				C0FFEE00000000000000000E /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
@@ -3898,7 +3898,7 @@
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				C3D9062327B7E3C900EF2386 /* Debug */,
-				C3D9062427B7E3C900EF2386 /* Release - Debug */,
+				C3D9062427B7E3C900EF2386 /* Release+Asserts */,
 				C3D9062527B7E3C900EF2386 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
@@ -3908,7 +3908,7 @@
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				ED5E0E8F2CD30B180071433B /* Debug */,
-				ED5E0E902CD30B180071433B /* Release - Debug */,
+				ED5E0E902CD30B180071433B /* Release+Asserts */,
 				ED5E0E912CD30B180071433B /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
@@ -3918,7 +3918,7 @@
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				ED91F0142CBDA5D3008388AA /* Debug */,
-				ED91F0152CBDA5D3008388AA /* Release - Debug */,
+				ED91F0152CBDA5D3008388AA /* Release+Asserts */,
 				ED91F0162CBDA5D3008388AA /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
