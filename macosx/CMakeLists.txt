@@ -205,8 +205,7 @@ set(XIB_FILES
     InfoWindow.xib
     MessageWindow.xib
     StatsWindow.xib
-    StatusBar.xib
-    URLSheetWindow.xib)
+    StatusBar.xib)
 
 set(RESOURCES
     Defaults.plist
