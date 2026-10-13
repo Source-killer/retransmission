@@ -204,7 +204,6 @@ set(XIB_FILES
     InfoTrackersView.xib
     InfoWindow.xib
     MessageWindow.xib
-    StatsWindow.xib
     StatusBar.xib)
 
 set(RESOURCES
