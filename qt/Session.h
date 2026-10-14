@@ -25,12 +25,10 @@
 #include <libtransmission/types.h>
 #include <libtransmission/variant.h>
 
-#include <libtransmission-app/rpc-queue.h>
 #include <libtransmission-app/session.h>
 
 #include "Prefs.h"
 #include "RpcClient.h"
-#include "Torrent.h"
 #include "Typedefs.h"
 
 class AddData;
