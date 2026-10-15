@@ -516,7 +516,23 @@ static NSString* const kWebUIURLFormat = @"http://localhost:%ld/";
 
 - (void)updateBlocklist:(id)sender
 {
-    [BlocklistDownloaderViewController downloadWithPrefsController:self];
+    auto const blocklistDownloaderViewController = [[BlocklistDownloaderViewController alloc] initWithSessionHandle:self.fHandle];
+
+    __weak auto weakSelf = self;
+
+    [blocklistDownloaderViewController showAsSheetModalForWindow:self.window completionHandler:^(NSString* _Nullable error) {
+        if (error) {
+            NSAlert* alert = [[NSAlert alloc] init];
+            [alert addButtonWithTitle:NSLocalizedString(@"OK", @"Blocklist -> button")];
+            alert.messageText = NSLocalizedString(@"Download of the blocklist failed.", @"Blocklist -> message");
+            alert.alertStyle = NSAlertStyleWarning;
+            alert.informativeText = error;
+
+            [alert beginSheetModalForWindow:weakSelf.window completionHandler:nil];
+        } else {
+            [weakSelf updateBlocklistFields];
+        }
+    }];
 }
 
 - (void)setBlocklistAutoUpdate:(id)sender

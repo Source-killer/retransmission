@@ -197,7 +197,6 @@ target_sources(${TR_NAME}-mac
         UTTypeAdditions.mm)
 
 set(XIB_FILES
-    BlocklistStatusWindow.xib
     FilterBar.xib
     InfoFileView.xib
     InfoPeersView.xib
