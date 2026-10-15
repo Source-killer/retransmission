@@ -72,11 +72,6 @@ static_assert(tr::serializer::has_unique_keys<tr::SessionSettings, tr::SessionAl
 
 namespace
 {
-[[nodiscard]] auto get_settings_filename(std::string_view const config_dir)
-{
-    return fmt::format("{:s}/settings.json"sv, config_dir);
-}
-
 namespace bandwidth_group_helpers
 {
 [[nodiscard]] auto get_bandwidth_filename(std::string_view const config_dir)
@@ -469,9 +464,14 @@ tr::Settings tr_sessionGetSettings(tr_session const* session)
     return settings;
 }
 
+std::string tr_sessionGetSettingsFilename(std::string_view const config_dir)
+{
+    return fmt::format("{:s}/settings.json"sv, config_dir);
+}
+
 tr::Settings tr_sessionLoadSettings(std::string_view const config_dir, tr::Settings const& app_defaults)
 {
-    auto settings = tr::settings::load(get_settings_filename(config_dir)); // file vals
+    auto settings = tr::settings::load(tr_sessionGetSettingsFilename(config_dir)); // file vals
     settings.merge(app_defaults); // fallbacks from app defaults
     settings.merge(tr_sessionGetDefaultSettings()); // fallbacks from defaults
     return settings;
@@ -483,7 +483,7 @@ void tr_sessionSaveSettings(tr_session* session, std::string_view const config_d
         return;
     }
 
-    auto const filename = get_settings_filename(config_dir);
+    auto const filename = tr_sessionGetSettingsFilename(config_dir);
     auto settings = tr_sessionGetSettings(session); // live vals
     settings.merge(app_settings); // user-provided vals
     settings.merge(tr::settings::load(filename)); // fallbacks from pre-existing file
@@ -1338,8 +1338,10 @@ void tr_session::closeImplPart1(std::promise<void>* closed_promise, std::chrono:
     save_timer_.reset();
     queue_timer_.reset();
     now_timer_.reset();
-    rpc_server_.reset();
+    // before rpc_server_: ~Updater answers pending blocklist_update requests,
+    // and answering one from an HTTP client writes to an evhttp request that rpc_server_ owns.
     blocklist_updater_.reset();
+    rpc_server_.reset();
     dht_.reset();
     lpd_.reset();
 
