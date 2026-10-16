@@ -251,6 +251,7 @@ public:
             deadline_ns_ = to_ns(mediator.now() + deadline);
         }
         queued_tasks_cv_.notify_one();
+        curl_multi_wakeup(multi_.get());
     }
 
     void fetch(FetchOptions&& options)
@@ -263,6 +264,7 @@ public:
 
         queued_tasks_.emplace_back(*this, std::move(options));
         queued_tasks_cv_.notify_one();
+        curl_multi_wakeup(multi_.get());
     }
 
     [[nodiscard]] bool is_idle() const noexcept
@@ -561,7 +563,7 @@ public:
             // then pause the torrent for a tick. curl will deliver `data`
             // again when the transfer is unpaused.
             if (task->impl.mediator.clamp(*tag, bytes_used) < bytes_used) {
-                task->impl.paused_easy_handles.emplace(task->easy(), tr_time_msec());
+                task->impl.paused_easy_handles.emplace(task->easy(), tr_time_msec() + BandwidthPauseMsec);
                 return CURL_WRITEFUNC_PAUSE;
             }
         }
@@ -739,25 +741,30 @@ public:
         }
     }
 
-    void resumePausedTasks()
+    std::optional<uint64_t> paused_tasks_upkeep()
     {
         TR_ASSERT(std::this_thread::get_id() == curl_thread->get_id());
 
         auto& paused = paused_easy_handles;
-        if (std::empty(paused)) {
-            return;
-        }
-
         auto const now = tr_time_msec();
 
+        // Unpause any tasks where the timeout has expired
         for (auto it = std::begin(paused); it != std::end(paused);) {
-            if (it->second + BandwidthPauseMsec < now) {
-                curl_easy_pause(it->first, CURLPAUSE_CONT);
+            auto const [easy, resume_at] = *it;
+            if (resume_at < now) {
+                curl_easy_pause(easy, CURLPAUSE_CONT);
                 it = paused.erase(it);
             } else {
                 ++it;
             }
         }
+
+        if (std::empty(paused)) {
+            return {};
+        }
+
+        // Return the number of milliseconds until the next paused task should be unpaused
+        return std::ranges::min(paused | std::views::values) - now;
     }
 
     void remove_task(Task const& task)
@@ -784,13 +791,11 @@ public:
     // the thread started by Impl.curl_thread runs this function
     void curlThreadFunc()
     {
-        auto const multi = curl_helpers::multi_unique_ptr{ curl_multi_init() };
+        auto const& multi = multi_;
         (void)curl_multi_setopt(multi.get(), CURLMOPT_MAXCONNECTS, MaxCachedConnections);
         (void)curl_multi_setopt(multi.get(), CURLMOPT_MAX_TOTAL_CONNECTIONS, MaxTotalConnections);
         (void)curl_multi_setopt(multi.get(), CURLMOPT_MAX_HOST_CONNECTIONS, MaxHostConnections);
-        auto const start_time = mediator.now();
 
-        auto repeats = unsigned{};
         for (;;) {
             if (deadline_reached()) {
                 while (!std::empty(running_tasks_)) {
@@ -824,30 +829,17 @@ public:
                 }
             }
 
-            resumePausedTasks();
+            auto const next_unpause_ms = paused_tasks_upkeep();
 
-            // During steady state, wake up once per second.
-            // But during startup, wake up 10x more often. This is so tests
-            // that should take a few msec don't block for a full second
-            // while tr_session waits for this thread to finish.
-            static auto constexpr StartupSecs = std::chrono::seconds{ 15 };
-            auto const timeout_ms = mediator.now() - start_time < StartupSecs ? 50 : 1000;
+            // Wake up once per second, or when the next task is due to unpause, whichever is sooner.
+            static constexpr int DefaultTimeout = 1000;
+            auto const timeout_ms = next_unpause_ms && std::cmp_less(*next_unpause_ms, DefaultTimeout) ?
+                static_cast<int>(*next_unpause_ms) :
+                DefaultTimeout;
 
-            // Adapted from https://curl.se/libcurl/c/curl_multi_wait.html docs.
-            // 'numfds' being zero means either a timeout or no file descriptors to
-            // wait for. Try timeout on first occurrence, then assume no file
-            // descriptors and no file descriptors to wait for means wait for 100
-            // milliseconds.
+            // Wait for activity on the curl sockets, or for the timeout to expire.
             auto numfds = int{};
-            curl_multi_wait(multi.get(), nullptr, 0, timeout_ms, &numfds);
-            if (numfds == 0) {
-                ++repeats;
-                if (repeats > 1U) {
-                    std::this_thread::sleep_for(100ms);
-                }
-            } else {
-                repeats = 0;
-            }
+            curl_multi_poll(multi.get(), nullptr, 0, timeout_ms, &numfds);
 
             // nonblocking update of the tasks
             auto n_running = int{};
@@ -886,6 +878,8 @@ public:
     curl_helpers::shared_unique_ptr const curlsh_{ curl_share_init() };
 
     std::map<std::string /*host*/, std::stack<curl_helpers::easy_unique_ptr>, std::less<>> easy_pool_;
+
+    curl_helpers::multi_unique_ptr const multi_{ curl_multi_init() };
 
     std::mutex tasks_mutex_;
     std::condition_variable queued_tasks_cv_;
