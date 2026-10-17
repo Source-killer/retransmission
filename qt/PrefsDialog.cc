@@ -304,11 +304,11 @@ QString PrefsDialog::getPortStatusText(PortTestStatus const status)
 
 void PrefsDialog::updatePortStatusLabel()
 {
-    auto const status_ipv4 = getPortStatusText(port_test_status_[Session::PORT_TEST_IPV4]);
-    auto const status_ipv6 = getPortStatusText(port_test_status_[Session::PORT_TEST_IPV6]);
+    auto const status_ipv4 = getPortStatusText(port_test_status_[TR_AF_INET]);
+    auto const status_ipv6 = getPortStatusText(port_test_status_[TR_AF_INET6]);
 
     ui_.peerPortStatusLabel->setText(
-        port_test_status_[Session::PORT_TEST_IPV4] == port_test_status_[Session::PORT_TEST_IPV6] ?
+        port_test_status_[TR_AF_INET] == port_test_status_[TR_AF_INET6] ?
             TR_FORMAT("Status: <b>{status}</b>", fmt::arg("status", status_ipv4)) :
             TR_FORMAT(
                 "Status: <b>{status_ipv4}</b> (IPv4), <b>{status_ipv6}</b> (IPv6)",
@@ -321,13 +321,12 @@ void PrefsDialog::portTestSetEnabled()
     // Depend on the RPC call status instead of the UI status, so that the widgets
     // won't be enabled even if the port peer port changed while we have port_test
     // RPC call(s) in-flight.
-    auto const sensitive = !session_.portTestPending(Session::PORT_TEST_IPV4) &&
-        !session_.portTestPending(Session::PORT_TEST_IPV6);
+    auto const sensitive = !session_.portTestPending(TR_AF_INET) && !session_.portTestPending(TR_AF_INET6);
     ui_.testPeerPortButton->setEnabled(sensitive);
     ui_.peerPortSpin->setEnabled(sensitive);
 }
 
-void PrefsDialog::onPortTested(std::optional<bool> const result, Session::PortTestIpProtocol const ip_protocol)
+void PrefsDialog::onPortTested(std::optional<bool> const result, tr_address_type const ip_protocol)
 {
     // Only update the UI if the current status is "checking", so that
     // we won't show the port test results for the old peer port if it
@@ -348,8 +347,8 @@ void PrefsDialog::onPortTest()
     port_test_status_.fill(PortTestStatus::Checking);
     updatePortStatusLabel();
 
-    session_.portTest(Session::PORT_TEST_IPV4);
-    session_.portTest(Session::PORT_TEST_IPV6);
+    session_.portTest(TR_AF_INET);
+    session_.portTest(TR_AF_INET6);
 
     portTestSetEnabled();
 }
