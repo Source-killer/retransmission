@@ -267,9 +267,17 @@ public:
         curl_multi_wakeup(multi_.get());
     }
 
-    [[nodiscard]] bool is_idle() const noexcept
+    // Callers pass their lock to prove they hold tasks_mutex_.
+    [[nodiscard]] bool is_idle([[maybe_unused]] std::unique_lock<std::mutex> const& lock) const noexcept
     {
+        TR_ASSERT(lock.owns_lock() && lock.mutex() == &tasks_mutex_);
         return std::empty(queued_tasks_) && std::empty(running_tasks_);
+    }
+
+    [[nodiscard]] bool is_idle() const
+    {
+        auto const lock = std::unique_lock{ tasks_mutex_ };
+        return is_idle(lock);
     }
 
     class Task
@@ -770,8 +778,13 @@ public:
         return std::ranges::min(paused | std::views::values) - now;
     }
 
-    void remove_task(Task const& task)
+    void remove_task(Task& task)
     {
+        // Run the callback before taking tasks_mutex_.
+        // The default Mediator::run() invokes it on this thread.
+        // Without this, a callback that calls fetch() or is_idle() would deadlock.
+        task.done();
+
         auto const lock = std::unique_lock{ tasks_mutex_ };
 
         auto const iter = std::ranges::find(running_tasks_, task);
@@ -780,7 +793,6 @@ public:
             return;
         }
 
-        iter->done();
         running_tasks_.erase(iter);
     }
 
@@ -812,12 +824,12 @@ public:
                 // sleep until there's something to do.
                 // NB: a pending shutdown must stop the wait; if it prolonged
                 // it instead, the loop could sleep through its exit condition
-                auto const stop_waiting = [this]() {
-                    return !is_idle() || deadline_exists();
+                auto const stop_waiting = [this, &lock]() {
+                    return !is_idle(lock) || deadline_exists();
                 };
                 queued_tasks_cv_.wait(lock, stop_waiting);
 
-                if (deadline_exists() && is_idle()) {
+                if (deadline_exists() && is_idle(lock)) {
                     break;
                 }
 
@@ -888,7 +900,7 @@ public:
 
     curl_helpers::multi_unique_ptr const multi_{ curl_multi_init() };
 
-    std::mutex tasks_mutex_;
+    mutable std::mutex tasks_mutex_;
     std::condition_variable queued_tasks_cv_;
     std::list<Task> queued_tasks_;
     std::list<Task> running_tasks_;
@@ -947,7 +959,7 @@ void tr_web::startShutdown(std::chrono::milliseconds deadline)
     impl_->startShutdown(deadline);
 }
 
-bool tr_web::is_idle() const noexcept
+bool tr_web::is_idle() const
 {
     return impl_->is_idle();
 }
