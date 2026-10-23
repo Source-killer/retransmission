@@ -202,7 +202,6 @@ set(XIB_FILES
     FilterBar.xib
     InfoFileView.xib
     InfoPeersView.xib
-    InfoTrackersView.xib
     InfoWindow.xib
     MessageWindow.xib
     StatusBar.xib)
