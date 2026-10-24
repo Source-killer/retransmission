@@ -150,6 +150,10 @@ target_sources(${TR_NAME}-mac
         PrefsController.mm
         PrefsGeneralTabViewController.h
         PrefsGeneralTabViewController.mm
+        PrefsNetworkTabViewController.h
+        PrefsNetworkTabViewController.mm
+        PrefsUI.h
+        PrefsUI.mm
         PrefsWindow.h
         PrefsWindow.mm
         PriorityPopUpButtonCell.h
@@ -361,6 +365,7 @@ set(LANG_STRINGS_FILES
     InfoPlist.strings
     Localizable.strings
     PreferencesGeneralTab.strings
+    PreferencesNetworkTab.strings
     TorrentContextMenu.strings)
 
 foreach(LANG ${ENABLED_LINGUAS})
