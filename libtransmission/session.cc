@@ -778,6 +778,15 @@ void tr_session::setSettings(tr_session::Settings&& settings_in, bool force)
     auto local_peer_port = force && settings_.peer_port_random_on_start ? randomPort() : new_settings.peer_port;
     bool port_changed = false;
     if (force || local_peer_port_ != local_peer_port) {
+        // startup is logged by the listening sockets instead
+        if (!force) {
+            tr_logAddInfo(
+                fmt::format(
+                    "Peer port changed from {old_port} to {port}",
+                    fmt::arg("old_port", local_peer_port_.host()),
+                    fmt::arg("port", local_peer_port.host())));
+        }
+
         local_peer_port_ = local_peer_port;
         advertised_peer_port_ = local_peer_port;
         port_changed = true;

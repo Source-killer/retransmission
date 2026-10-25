@@ -195,11 +195,6 @@ private:
         natpmp_state_ = result.state;
         if (!std::empty(result.local_port) && !std::empty(result.advertised_port)) {
             mediator_.on_port_forwarded(result.advertised_port);
-            tr_logAddInfo(
-                fmt::format(
-                    "Mapped private port {private_port} to public port {public_port}",
-                    fmt::arg("private_port", result.local_port.host()),
-                    fmt::arg("public_port", result.advertised_port.host())));
         }
 
         upnp_state_ = tr_upnpPulse(
