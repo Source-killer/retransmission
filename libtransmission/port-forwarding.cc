@@ -3,7 +3,6 @@
 // or any future license endorsed by Mnemosaic LLC.
 // License text can be found in the licenses/ folder.
 
-#include <algorithm>
 #include <chrono>
 #include <memory>
 
@@ -72,7 +71,27 @@ public:
 
     [[nodiscard]] tr_port_forwarding_state state() const noexcept override
     {
-        return std::max(natpmp_state_, upnp_state_);
+        // TR_PORT_ERROR is lowest in tr_port_forwarding_state, so std::max()
+        // would let an idle UPnP hide a NAT-PMP failure and keep the timer
+        // retrying at the in-progress rate. Rank: mapped > busy > failed > idle.
+        static auto constexpr Rank = [](tr_port_forwarding_state s)
+        {
+            switch (s)
+            {
+            case TR_PORT_MAPPED:
+                return 4;
+            case TR_PORT_MAPPING:
+                return 3;
+            case TR_PORT_UNMAPPING:
+                return 2;
+            case TR_PORT_ERROR:
+                return 1;
+            default:
+                return 0;
+            }
+        };
+
+        return Rank(natpmp_state_) >= Rank(upnp_state_) ? natpmp_state_ : upnp_state_;
     }
 
 private:
@@ -160,6 +179,9 @@ private:
 
         case TR_PORT_UNMAPPED:
             return "Not forwarded";
+
+        case TR_PORT_ERROR:
+            return _("Failed");
 
         default:
             return "???";
