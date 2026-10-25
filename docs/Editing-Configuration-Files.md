@@ -131,6 +131,7 @@ Here is a sample of the three basic types: respectively Boolean, Number and Stri
  * **peer_port_random_low:** Number (default = 49152)
  * **peer_port_random_on_start:** Boolean (default = false)
  * **port_forwarding_enabled:** Boolean (default = true) Enable [UPnP](https://en.wikipedia.org/wiki/Universal_Plug_and_Play) or [NAT-PMP](https://en.wikipedia.org/wiki/NAT_Port_Mapping_Protocol).
+ * **natpmp_gateway_ipv4:** String (default = "") IPv4 address of the NAT-PMP gateway. When empty, Retransmission uses the default route's gateway. Set this when the NAT-PMP router is not the default gateway, e.g. behind a VPN.
 
 #### Queuing
  * **download_queue_enabled:** Boolean (default = true) When true, Retransmission will only download `download_queue_size` non-stalled torrents at once.
