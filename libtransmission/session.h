@@ -678,6 +678,16 @@ public:
         return blocklist_updater_.get();
     }
 
+    // port forwarding
+
+    [[nodiscard]] constexpr auto const& natpmp_gateway_ipv4() const noexcept
+    {
+        return settings().natpmp_gateway_ipv4;
+    }
+
+    // returns false, leaving the setting unchanged, unless `addr` is empty or an IPv4 address
+    bool set_natpmp_gateway_ipv4(std::string_view addr);
+
     // RPC
 
     void setRpcWhitelist(std::string_view whitelist) const;

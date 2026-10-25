@@ -603,6 +603,7 @@ Response parameters: `path`, `name`, and `id`, holding the torrent ID integer
 | `incomplete_dir` | string | path for incomplete torrents, when enabled
 | `incomplete_dir_enabled` | boolean | true means keep torrents in `incomplete_dir` until done
 | `lpd_enabled` | boolean | true means allow Local Peer Discovery in public torrents
+| `natpmp_gateway_ipv4` | string | IPv4 address of the NAT-PMP gateway; empty means use the default route's gateway
 | `peer_limit_global` | number | maximum global number of peers
 | `peer_limit_per_torrent` | number | maximum global number of peers
 | `peer_port_random_on_start` | boolean | true means pick a random peer port on launch
@@ -1162,5 +1163,7 @@ Transmission 4.2.0 (`rpc_version_semver` 6.1.0, `rpc_version`: 20)
 | `session_get` | new arg `blocklist_date`
 | `session_get` | new arg `blocklist_updates_enabled`
 | `session_set` | new arg `blocklist_updates_enabled`
+| `session_get` | new arg `natpmp_gateway_ipv4`
+| `session_set` | new arg `natpmp_gateway_ipv4`
 | `session_stats` | :warning: **DEPRECATED** `active_torrent_count`. Use `unpaused_torrent_count` instead; it will be removed in Transmission 5.0.0.
 | `session_get` | :warning: **DEPRECATED** `cache_size_mib`. The memory cache is being removed, making this setting moot. The setting will still be gettable and settable via RPC `session_get` and `session_set` until Transmission 5.0.0 to avoid client breakage, but it will be otherwise unused in libtransmission. Clients should stop using this key.
