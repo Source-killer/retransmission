@@ -44,6 +44,7 @@ target_sources(libtransmission-test
         peer-mgr-wishlist-test.cc
         peer-msgs-test.cc
         platform-test.cc
+        port-forwarding-natpmp-test.cc
         quark-test.cc
         remove-test.cc
         rename-test.cc
@@ -112,6 +113,7 @@ target_link_libraries(libtransmission-test
         transmission::fmt-header-only
         libevent::core
         libevent::extra
+        natpmp::natpmp
         WideInteger::WideInteger
         wildmat)
 
