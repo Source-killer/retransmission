@@ -681,8 +681,7 @@ TEST_F(RpcTest, sessionGet)
 
 TEST_F(RpcTest, sessionSetNatpmpGatewayIpv4)
 {
-    auto const set_gateway = [this](std::string_view value)
-    {
+    auto const set_gateway = [this](std::string_view value) {
         return makeRequest(
             session_,
             fmt::format(

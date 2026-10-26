@@ -2162,8 +2162,7 @@ using SessionAccessors = std::pair<SessionGetter, SessionSetter>;
     map.try_emplace(
         TR_KEY_natpmp_gateway_ipv4,
         [](tr_session const& src) -> tr_variant { return src.natpmp_gateway_ipv4(); },
-        [](tr_session& tgt, tr_variant const& src, ErrorInfo& err)
-        {
+        [](tr_session& tgt, tr_variant const& src, ErrorInfo& err) {
             if (auto const val = src.value_if<std::string_view>(); !val || !tgt.set_natpmp_gateway_ipv4(*val)) {
                 err = { JsonRpc::Error::INVALID_PARAMS, "natpmp_gateway_ipv4 must be an IPv4 address or empty"s };
             }

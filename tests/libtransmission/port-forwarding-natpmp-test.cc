@@ -43,8 +43,7 @@ namespace
 class FakeNatpmpGateway
 {
 public:
-    struct Request
-    {
+    struct Request {
         uint8_t opcode = 0;
         uint16_t internal_port = 0;
         uint32_t lifetime = 0;
@@ -63,8 +62,7 @@ public:
         addr.sin_port = htons(NATPMP_PORT);
         addr.sin_addr.s_addr = htonl(INADDR_LOOPBACK);
         if (bind(sock_, reinterpret_cast<sockaddr const*>(&addr), sizeof(addr)) != 0 ||
-            evutil_make_socket_nonblocking(sock_) != 0)
-        {
+            evutil_make_socket_nonblocking(sock_) != 0) {
             tr_net_close_socket(sock_);
             sock_ = TR_BAD_SOCKET;
         }
