@@ -36,6 +36,7 @@
 #include "libtransmission/inout.h"
 #include "libtransmission/log.h"
 #include "libtransmission/open-files.h"
+#include "libtransmission/profile.h"
 #include "libtransmission/storage-descriptor.h"
 #include "libtransmission/torrent.h"
 #include "libtransmission/torrents.h"
@@ -584,6 +585,7 @@ private:
         tr_byte_span_t span;
         std::unique_ptr<BlockData> data;
         OnWrite on_write;
+        tr::profile::Stamp admitted = {};
     };
 
     // A piece hash the gate admitted, waiting for a worker.
@@ -878,7 +880,12 @@ private:
     template<typename Fn>
     void post_completion(Fn&& fn)
     {
-        auto completion = std::make_unique<ParkedFn<std::decay_t<Fn>>>(std::forward<Fn>(fn));
+        // Measures how long the session thread takes to get to a finished op.
+        auto timed = [posted = tr::profile::Stamp{}, fn = std::forward<Fn>(fn)]() mutable {
+            posted.record_since("storage.completion_wait");
+            fn();
+        };
+        auto completion = std::make_unique<ParkedFn<decltype(timed)>>(std::move(timed));
 
         auto need_wake = bool{};
         {
@@ -906,6 +913,7 @@ private:
             std::swap(done, done_);
         }
 
+        TR_PROFILE_SCOPE("storage.deliver_completions");
         for (auto const& completion : done) {
             completion->deliver();
         }
@@ -977,6 +985,7 @@ private:
             n_bytes += op.span.size();
             next_byte = op.span.end;
             cursor_ = it->first;
+            op.admitted.record_since("storage.write_queue_wait");
             run.emplace_back(std::move(it->second));
             it = pending_writes_.erase(it);
         }
@@ -1004,6 +1013,7 @@ private:
 
     void exec_write_run(std::vector<PendingWrite> run, std::vector<uint8_t>& scratch)
     {
+        TR_PROFILE_SCOPE("storage.write_run");
         TR_ASSERT(!std::empty(run));
 
         auto const& desc = *run.front().desc;
@@ -1059,11 +1069,13 @@ private:
 
     void exec_test(PendingTest op)
     {
+        TR_PROFILE_SCOPE("storage.test_piece");
         auto const& block_info = op.desc->block_info;
         auto hash = tr_sha1_digest_t{};
         auto err = tr_error_code_t{};
 
         if (auto const blocks = retained_.take(op.tor_id, op.piece); !std::empty(blocks)) {
+            TR_PROFILE_SCOPE("storage.hash_retained_buffers");
             auto const first_block = block_info.block_span_for_piece(op.piece).begin;
             auto const found = tr_ioHashPiece(
                 block_info,
