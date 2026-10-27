@@ -474,16 +474,24 @@ TEST_F(WebTest, interfaceBindingOverridesBindAddress)
 #else
     // binding to 192.0.2.1 fails, so only the interface can carry the fetch
     mediator_.bind_address_ = "192.0.2.1";
-#ifdef __linux__
-    mediator_.bind_interface_ = "lo";
-#else
-    mediator_.bind_interface_ = "lo0";
-#endif
+    mediator_.bind_interface_ = std::string{ tr::test::LoopbackInterface };
 
     auto const response = fetch(options());
     EXPECT_EQ(200, response.status) << response.errmsg.value_or("");
     EXPECT_EQ("127.0.0.1"sv, response.primary_ip);
 #endif
+}
+
+TEST_F(WebTest, missingInterfaceFailsInsteadOfFallingBack)
+{
+    // the default route reaches the server, so a fetch that
+    // drops the failed binding would succeed
+    mediator_.bind_interface_ = "tr-no-such-interface";
+
+    auto const response = fetch(options());
+    EXPECT_EQ(0, response.status);
+    EXPECT_FALSE(response.did_connect);
+    EXPECT_TRUE(std::empty(server_.lastRequest().method));
 }
 
 TEST_F(WebTest, blockedInterfaceIsRefused)

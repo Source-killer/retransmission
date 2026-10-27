@@ -21,6 +21,7 @@
 #include <mutex>
 #include <stack>
 #include <string>
+#include <string_view>
 #include <thread>
 #include <utility>
 
@@ -422,19 +423,23 @@ public:
             }
         }
 
-        // Set by initEasy() when it hands curl an interface to bind to
-        void set_interface_bound() noexcept
+        // Set by initEasy() to the interface this task's sockets are bound to
+        void set_bind_interface(std::string_view const name)
         {
-            interface_bound_ = true;
+            bind_interface_ = name;
+        }
+
+        [[nodiscard]] std::string const& bind_interface() const noexcept
+        {
+            return bind_interface_;
         }
 
         // An interface binding takes precedence over the bind addresses:
-        // curl binds the socket to the interface after open_socket()
-        // creates it, and a socket open_socket() had bound to an address
-        // could not be bound again.
+        // the socket is bound to the interface instead, and binding it to
+        // an address too would pin a source the interface may not have.
         [[nodiscard]] std::optional<tr_address> bind_address(int const af) const
         {
-            if (interface_bound_) {
+            if (!std::empty(bind_interface_)) {
                 return {};
             }
             return impl.mediator.bind_address(af).and_then(&tr_address::from_string);
@@ -509,7 +514,7 @@ public:
 
         uint64_t generation_;
 
-        bool interface_bound_ = false;
+        std::string bind_interface_;
 
         CURL* easy_;
         CURLM* multi_ = nullptr;
@@ -692,6 +697,15 @@ public:
         }
 
         if (address->family == AF_INET || address->family == AF_INET6) {
+#ifdef __linux__
+            // curl's own SO_BINDTODEVICE falls back to binding the interface's
+            // address when the kernel refuses it, so bind here and fail instead
+            if (!tr_netSetSocketInterface(sock, tr_af_to_ip_protocol(address->family), task->bind_interface())) {
+                tr_net_close_socket(sock);
+                return CURL_SOCKET_BAD;
+            }
+#endif
+
             if (auto const bind_addr = task->bind_address(address->family)) {
 #ifdef IP_BIND_ADDRESS_NO_PORT
                 static constexpr int One = 1;
@@ -735,15 +749,18 @@ public:
         // CURLOPT_INTERFACE. curl applies them to every socket it opens regardless of the
         // address family it resolved, so an IPv4 bind address would also be forced onto
         // IPv6 sockets. open_socket() binds each socket according to its resolved family
-        // instead. An interface name ("if!eth0") suits both families, so it goes to curl.
+        // instead. An interface name ("if!eth0") suits both families, so it goes to curl,
+        // except on Linux, where open_socket() binds to the interface itself.
         //
         // `session_binding` must be the value cancel_invalidated_tasks() checked this
         // task against. A fresh read of the mediator could be "blocked", which has no
         // interface string and would fall through to the bind addresses.
         if (session_binding) {
             if (auto const curl_interface = tr_netCurlInterfaceString(*session_binding); curl_interface) {
+#ifndef __linux__
                 (void)curl_easy_setopt(e, CURLOPT_INTERFACE, curl_interface->c_str());
-                task.set_interface_bound();
+#endif
+                task.set_bind_interface(tr_net_effective_bind_interface(*session_binding));
             }
         }
 
