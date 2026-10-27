@@ -17,6 +17,7 @@
 
 #include <gtest/gtest.h>
 
+#include <libtransmission/net.h>
 #include <libtransmission/quark.h>
 #include <libtransmission/transmission.h>
 #include <libtransmission/rpcimpl.h>
@@ -37,6 +38,23 @@ using RpcTest = SessionTest;
 
 namespace
 {
+// true when a TCP connection to 127.0.0.1:`port` is accepted
+[[nodiscard]] bool canConnectToLoopback(uint16_t const port)
+{
+    auto const sock = socket(PF_INET, SOCK_STREAM, 0);
+    if (!is_valid_socket(sock)) {
+        return false;
+    }
+
+    auto sin = sockaddr_in{};
+    sin.sin_family = AF_INET;
+    sin.sin_addr.s_addr = htonl(INADDR_LOOPBACK);
+    sin.sin_port = htons(port);
+    auto const connected = connect(sock, reinterpret_cast<sockaddr const*>(&sin), sizeof(sin)) == 0;
+    tr_net_close_socket(sock);
+    return connected;
+}
+
 [[nodiscard]] std::string makeRequest(tr_session* session, std::string_view const jsonreq)
 {
     auto serde = tr_variant_serde::json().inplace();
@@ -719,6 +737,45 @@ TEST_F(RpcTest, sessionBindInterface)
     auto const bind_interface = result->value_if<std::string_view>(TR_KEY_bind_interface);
     ASSERT_TRUE(bind_interface);
     EXPECT_EQ("lo0"sv, *bind_interface);
+}
+
+// A settings reload moves a running RPC listener onto its new interface.
+TEST_F(RpcTest, reloadRebindsTheRpcListener)
+{
+    if (!TrNetCanBindInterface) {
+        GTEST_SKIP() << "this platform can't bind sockets to an interface by name";
+    }
+
+    auto const interfaces = tr_net_interfaces();
+    auto const other = std::ranges::find_if(interfaces, [](auto const& iface) { return iface.name != LoopbackInterface; });
+    if (other == std::end(interfaces)) {
+        GTEST_SKIP() << "needs a network interface besides loopback";
+    }
+
+    auto const port = freePort();
+    ASSERT_NE(0U, port) << "no free port on this host";
+
+    auto const reload = [this, port](std::string_view const bind_interface) {
+        auto settings = tr_sessionGetSettings(session_);
+        settings.insert_or_assign(TR_KEY_rpc_enabled, true);
+        settings.insert_or_assign(TR_KEY_rpc_bind_address, "127.0.0.1"sv);
+        settings.insert_or_assign(TR_KEY_rpc_port, int64_t{ port });
+        settings.insert_or_assign(TR_KEY_rpc_bind_interface, bind_interface);
+        tr_sessionSet(session_, settings);
+    };
+    auto const reachable = [port] {
+        return canConnectToLoopback(port);
+    };
+
+    reload(""sv);
+    EXPECT_TRUE(waitFor(reachable, 5s));
+
+    // traffic from this host arrives on loopback, which a listener bound to another interface refuses
+    reload(other->name);
+    EXPECT_TRUE(waitFor([&reachable] { return !reachable(); }, 5s)) << other->name;
+
+    reload(LoopbackInterface);
+    EXPECT_TRUE(waitFor(reachable, 5s));
 }
 
 TEST_F(RpcTest, torrentGet)
