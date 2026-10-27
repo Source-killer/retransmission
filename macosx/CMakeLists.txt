@@ -208,7 +208,6 @@ target_sources(${TR_NAME}-mac
 
 set(XIB_FILES
     FilterBar.xib
-    InfoWindow.xib
     MessageWindow.xib)
 
 set(RESOURCES
