@@ -103,13 +103,17 @@ std::shared_ptr<tr_peerIo> tr_peerIo::create(
     io->set_socket(std::move(socket));
     io->bandwidth().set_peer(io);
     io->flush_outbuf_trigger_->set_callback([weak = io->weak_from_this()] {
-        // https://github.com/transmission/transmission/issues/7307
-        static auto constexpr MinPayloadSize = 128U;
-
         if (auto const ptr = weak.lock()) {
-            if (ptr->outbuf_.size() >= MinPayloadSize) {
-                ptr->write_cb();
+            // Coalesce small protocol messages for at most one extra
+            // millisecond instead of waiting for the bandwidth pulse.
+            if (!ptr->small_flush_delayed_ && !ptr->outbuf_.empty() && ptr->outbuf_.size() < 128U) {
+                ptr->small_flush_delayed_ = true;
+                ptr->flush_outbuf_trigger_->start_single_shot(std::chrono::milliseconds{ 1 });
+                return;
             }
+
+            ptr->small_flush_delayed_ = false;
+            ptr->write_cb();
         }
     });
     tr_logAddTraceIo(io, fmt::format("bandwidth is {}; its parent is {}", fmt::ptr(&io->bandwidth()), fmt::ptr(parent)));
@@ -485,7 +489,12 @@ size_t tr_peerIo::flush_outgoing_protocol_msgs()
 
 void tr_peerIo::flush_outbuf_soon()
 {
-    flush_outbuf_trigger_->start_single_shot(std::chrono::milliseconds::zero());
+    // Keep the small-message deadline; a full batch can flush sooner.
+    // Decide whether to delay in the callback, after headers and payloads
+    // have been queued, to avoid restarting the timer for every header.
+    if (!small_flush_delayed_ || outbuf_.size() >= 128U) {
+        flush_outbuf_trigger_->start_single_shot(std::chrono::milliseconds::zero());
+    }
     tr_logAddTraceIo(this, "scheduled outbuf flush");
 }
 
