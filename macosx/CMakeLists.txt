@@ -344,7 +344,6 @@ else()
 endif()
 
 set(BASE_XIB_FILES
-    AddMagnetWindow.xib
     AddWindow.xib
     Creator.xib
     GroupRules.xib
@@ -356,6 +355,7 @@ list(TRANSFORM BASE_XIB_FILES
     PREPEND Base.lproj/)
 
 set(LANG_STRINGS_FILES
+    AddMagnetWindow.strings
     AppMenu.strings
     GlobalOptionsPopover.strings
     InfoGeneralView.strings
