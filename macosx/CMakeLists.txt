@@ -437,9 +437,6 @@ install(
     TARGETS ${TR_NAME}-mac
     DESTINATION Applications)
 
-install(
-    DIRECTORY TransmissionHelp
-    DESTINATION Applications/${MAC_BUNDLE_NAME}.app/Contents/Resources)
 tr_install_web(Applications/${MAC_BUNDLE_NAME}.app/Contents/Resources)
 
 install(CODE

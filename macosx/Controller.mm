@@ -130,6 +130,7 @@ static NSString* const kWebsiteURL = @TR_PROJ_URL_HOMEPAGE;
 static NSString* const kForumURL = @TR_PROJ_URL_FORUM;
 static NSString* const kGithubURL = @TR_PROJ_URL_GIT;
 static NSString* const kDonateURL = @TR_PROJ_URL_DONATE;
+static NSString* const kHelpURL = @TR_PROJ_URL_HELP;
 
 static NSTimeInterval const kDonateNagTime = 60 * 60 * 24 * 7;
 
@@ -4913,6 +4914,11 @@ static bool trashDataFile(std::string_view const filename, tr_error* const error
 - (IBAction)linkDonate:(id)sender
 {
     [NSWorkspace.sharedWorkspace openURL:[NSURL URLWithString:kDonateURL]];
+}
+
+- (void)linkHelp:(id)sender
+{
+    [NSWorkspace.sharedWorkspace openURL:[NSURL URLWithString:kHelpURL]];
 }
 
 - (void)rpcCallback:(tr_rpc_callback_type)type forTorrentId:(std::optional<tr_torrent_id_t>)torrentId
