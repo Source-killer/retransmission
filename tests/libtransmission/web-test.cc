@@ -658,13 +658,13 @@ TEST_F(WebTest, timeoutIsReported)
 TEST_F(WebTest, shutdownCancelsAllButFetchesToFinish)
 {
     // a handler that never replies keeps both fetches running
-    server_.setHandler([](evhttp_request* /*req*/) {});
+    server4_->setHandler([](evhttp_request* /*req*/) {});
 
     auto plain = fetchAsync(options("/plain"sv));
     auto opts = options("/announce"sv);
     opts.finish_at_shutdown = true;
     auto announce = fetchAsync(std::move(opts));
-    ASSERT_TRUE(tr::test::waitFor([this]() { return !std::empty(server_.lastRequest().method); }, 5s));
+    ASSERT_TRUE(tr::test::waitFor([this]() { return !std::empty(server4_->lastRequest().method); }, 5s));
 
     web_->startShutdown(10s);
 
