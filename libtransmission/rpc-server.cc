@@ -764,7 +764,7 @@ void start_server(tr_rpc_server* server)
         // the connection alive indefinitely. Setting timeouts using evhttp_set_timeout or its siblings
         // only partially mitigates the attack. GHSA-hrw7-9gf2-gw65
 
-        server->httpd = std::shared_ptr<struct evhttp>{ httpd, tr::evhelpers::EvhttpDeleter{} };
+        server->httpd.reset(httpd, &evhttp_free);
 
         tr_logAddInfo(fmt::format("Listening for RPC and Web requests on '{address}'", fmt::arg("address", addr_port_str)));
     }
